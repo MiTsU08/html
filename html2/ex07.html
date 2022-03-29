@@ -1,0 +1,102 @@
+<html>
+    <head>
+        <title>게시글목록</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <link rel="stylesheet" href="common.css">
+        <style>
+            #post, #info{
+                margin:30px;
+                padding: 20px;
+            }
+            h3{
+                border-bottom: 1px dotted gray;
+                margin-top: 10px;
+                cursor: pointer;
+                color: honeydew;
+            }
+            h1{text-shadow: 3px 3px 0px yellow, 6px 6px 9px #DA2; color:black}
+            #comments{
+                margin-top: 20px;
+            }
+            #comments h4{
+                margin-bottom: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="page">
+            <div id="top">
+                <h1>게시글목록</h1>
+            </div>
+            <div id="center">
+                <div id="posts"></div>
+                <hr/>
+                <h1>게시글정보</h1>
+                <div id="info">
+                    <h3 id="title"></h3>
+                    <p id="body"></p>
+                    <div id="comments"></div>
+                </div>
+            </div>
+            <div id="bottom">
+                <h5>ⓒ2022. 인천일보아카데미 All right reserved</h5>
+            </div>
+        </div>
+        
+    </body>
+<script>
+    $("#posts").on("click","h3",function(){
+        let postid=$(this).find(".id").html();
+       $.ajax({
+        type:"get",
+        dataType:"json",
+        url:"https://jsonplaceholder.typicode.com/posts/"+postid,
+        success:function(data){
+            let title=data.title;
+            let body=data.body;
+            $("#title").html(title);
+            $("#body").html(body);
+            //comments목록
+            $.ajax({
+                type: "get",
+                dataType: "json",
+                url:"https://jsonplaceholder.typicode.com/comments?postId="+postid,
+                success:function(data){
+                    let str="";
+                    $(data).each(function(){
+                        let id=this.id;
+                        let email=this.email;
+                        let body=this.body;
+                        str +="<h4>"+id+":"+email+"</h4>";
+                        str +="<p>"+body+"</p>";
+                    });
+                    $("#comments").html(str);
+                }
+            });
+        }
+       });
+    });
+    //게시글목록 출력
+    $.ajax({
+        type: "get",
+        dataType:"json",
+        url:"https://jsonplaceholder.typicode.com/posts",
+        success: function(data){
+            let str="";
+            $(data).each(function(){
+                let id=this.id;
+                let title=this.title;
+                if(id<=5){
+                str += "<h3>";
+                str += "<span class='id'>"+id+"</span>";
+                str += "<span class='title'>"+title+"</span>";
+                str += "</h3>";
+                }
+
+            });
+            $("#posts").html(str);
+        }
+    });
+
+</script>
+</html>

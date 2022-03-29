@@ -1,0 +1,87 @@
+<html>
+    <head>
+        <title>블로그</title>
+        <link rel="stylesheet" href="common.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <style>
+            #posts{border:  15px dotted lime; margin: 20px; padding: 10px;}
+            #posts p{margin-bottom: 20px; color: magenta;}
+            button:disabled{background: gray; color: white;}
+        </style>
+    </head>
+    <body>
+        <div id="page">
+            <div id="top">
+                <h1>게시글관리</h1>
+            </div>
+            <div id="center">
+                <div id="posts"></div>
+                <div id="bottons">
+               <!-- <button id="first">처음</button> -->
+                    <button id="prev">이전</button>
+                    <span id="curpage">1</span>
+                    <button id="next">다음</button>
+               <!-- <button id="last">마지막</button> -->
+                </div>
+            </div>
+                
+
+        </div>
+    
+    </body>
+    <script>
+        let curpage=1;//현제페이지
+        let perpagenum=10;//하나의 페이지의 출력되는 글 수
+        let lastpage=Math.ceil(100/perpagenum);//마지막 페이지
+        getList();
+
+            $("#next").on("click",function(){//<-다음을 클릭할경우
+                curpage++;
+                $("#curpage").html(curpage+"/"+lastpage);
+                getList();
+            });
+            //이전클릭경우
+            $("#prev").on("click",function(){
+                curpage--;
+                $("#curpage").html(curpage+"/"+lastpage);
+                getList();
+            });
+        function getList(){
+            $.ajax({
+            type:"get",
+            dataType:"json",
+            url:"https://jsonplaceholder.typicode.com/posts",
+            success:function(data){
+                let str="";
+                $(data).each(function(){
+                    let id=this.id;
+                    let title=this.title;
+                    let body=this.body;
+                    let start = (curpage-1)*perpagenum+1;//시작ID
+                    let end=(curpage)*perpagenum;//종료ID
+
+                    if(id>=start && id <=end){
+                        str+="<h3>"+id+":"+title+"</h3>";
+                        str+="<P>"+body+"</p>";
+                    }
+                });
+                $("#posts").html(str)
+                     //1페이지인 경우 이전버튼 방지
+                    if(curpage==1){
+                        $("#prev").attr("disabled",true);
+                    }else{
+                        $("#prev").attr("disabled",false);
+                    }
+                    //마지막 페이지 일때 다음버튼 방지
+                    if(curpage==lastpage){
+                        $("#next").attr("disabled",true);
+                    }else{
+                        $("#next").attr("disabled",false);
+                    
+                    }
+                }
+            });
+        };
+    </script>
+</html>
+

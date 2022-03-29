@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="common.css">
+    <script src="http://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/3.0.1/handlebars.js"></script>
+     <title>도서검색</title>
+     <style>
+         #books{
+             overflow: hidden;
+             width: 100%px;
+             margin: 0px auto;
+             padding-left: 20px;
+         }
+         .box{
+             float: left;
+             width: 160px;
+             border: 1px solid gray;
+             margin: 5px;
+             padding: 5px;
+             border-radius: 10px;
+             background-color: gray;
+             color: aqua;
+         }
+         .title, .authors{
+             overflow: hidden;
+             white-space: nowrap;
+             text-overflow: ellipsis;
+             font-size: 15px;
+         }
+         .price{
+             color: yellowgreen;
+            font-weight: bold;
+        }
+        #bookInfo{
+            border-top: 1px solid gray;
+            border-bottom: 1px solid gray;
+            margin: 10px;
+            padding: 10px 20px;
+            
+            
+        }
+
+        button:disabled{background-color: gray;}
+     </style>
+</head>
+<body>
+    <div id="page">
+        <div id="top">
+            <h1>도서검색</h1>
+        </div>
+        <div id="center">
+            <!--도서검색 리스트-->
+            <div id="bookInfo">
+                <input type="text" placeholder="검색어" id="query" value="자바">
+                검색 결과: <span id="total"></span >건 
+            </div>
+            <div id="books"></div>
+            <script id="temp" type="text/x-handlebars-template">
+                {{#each documents}}
+                    <div class="box">
+                        <img src="{{getSrc thumbnail}}" > 
+                        <div class="title">{{title}}</div>
+                        <div class="price">₩ {{price}}</div>
+                        <div class="authors">{{authors}}</div>
+                    </div>
+                {{/each}}         
+            </script>
+            <script>
+                Handlebars.registerHelper("getSrc",function(thumbnail){
+                    if(thumbnail){
+                        return thumbnail;
+                    }else{
+                        return "http://placehold.it/150x170/";
+                    }
+                });
+            </script>   
+            </div>
+            <div id="bottons">
+                <button id="prev">이전</button>
+                <span id="curpage">1</span>
+                <button id="next">다음</button>
+            </div>
+        
+        <div id="bottom">
+            <h3>ⓒ2022. 인천일보아카데미 All right Reserve.</h3>
+        </div>
+    </div>
+
+
+    
+</body>
+<script>
+    let page=1;
+    let query=$("#query").val();
+    getBooks();
+
+
+    $("#query").on("keydown",function(e){
+        if(e.keyCode==13){
+            page=1;
+            query=$("#query").val();
+            getBooks();
+
+        }
+    })
+
+
+    $("#prev").on("click",function(){
+        page--;
+        getBooks();
+    });
+    $("#next").on("click",function(){
+        page++;
+        getBooks();
+    });
+    function getBooks(){
+        $.ajax({
+            type:"get",
+            dataType:"json",
+            url:"https://dapi.kakao.com/v3/search/book?target=title",
+            headers:{"Authorization":"KakaoAK c2296b03372a2c967d4061bfc5a0d724"},
+            data:{"query":query,"size": 10, "page":page },
+            success:function(data){
+                let template = Handlebars.compile($("#temp").html());
+                $("#books").html(template(data));
+
+                $("#total").html(data.meta.pageable_count);//검색수
+                $("#curpage").html(page);//현제페이지
+
+                let is_end=data.meta.is_end;
+                if(page==1){
+                    $("#prev").attr("disabled",true);
+                }else{
+                    $("#prev").attr("disabled",false);
+                }
+                
+                if(is_end){
+                    $("#next").attr("disabled",true);
+                }else{
+                    $("#next").attr("disabled",false);
+                
+                }
+
+            }
+
+        
+        });
+    }
+    
+</script>
+</html>
+<!--템플릿-->
+<!-- <script id="temp" type="text/x-handlebars-template">
+    {{#each .}}
+                       
+    {{/each}}         
+</script>   -->

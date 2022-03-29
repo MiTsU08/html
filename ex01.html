@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>게시글목록</title>
+    <link rel="stylesheet" href="common.css">
+    <script src="http://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/3.0.1/handlebars.js"></script>
+    <style>
+        h3 {color: ivory; border-bottom: dashed yellowgreen;}
+        #temp{color: lightblue;}
+
+        #posts,#info{padding: 30px;}
+        #posts .title{
+            border-bottom: 1px dotted gray;
+            margin-bottom:  20px;
+            font-size: 20px;
+            color: greenyellow;
+            cursor: pointer;
+        }
+        h1{height: 35px; width: 300px; border: 5px double hotpink; text-align: center;}
+        #comments{border: turquoise;}
+    </style>
+</head>
+<body>
+    <div id="page">
+        <div id="top">
+            <h1>게시글관리</h1>
+        </div>
+        <div id="center">
+            <!--게시글 목록 출력-->
+            <h3>게시글목록</h3>
+        <div id="posts"></div>
+            <script id="temp" type="text/x-handlebars-template">
+                {{#each .}}
+                    <h4 class="title">
+                        [<span class="id">{{id}}</span>]
+                        <span>{{title}}</span></h4>
+                {{/each}}                
+            </script>
+            <!--게시글 정보 출력-->
+            <h3>게시글 정보</h3>
+            <div id="info"></div>
+                <script id="temp1" type="text/x-handlebars-template">
+                <h4>[{{id}}] {{title}}</h4>
+                <p>{{body}}</p> 
+                </script> 
+
+            <!--게시글 댓글 출력-->
+            <h3>댓글</h3>
+            <div id="comments"></div>
+            <script id="temp2" type="text/x-handlebars-template">
+                {{#each .}}
+                <h4>{{id}} {{email}} </h4>
+                <p>{{body}}</p>
+                {{/each}}
+                </script> 
+        </div>
+        <div id="bottom">
+            <h5>ⓒ2022. 인천일보아카데미 All right Reserve.</h5>
+        </div>
+    </div>
+</body>
+<script>
+    getPosts();
+    //posts안에 h4를 클릭한경우
+    $("#posts").on("click","h4",function(){
+        let postid=$(this).find(".id").html();
+         //게시글정보
+        $.ajax({
+           type: "get",
+           dataType: "json",
+           url: "https://jsonplaceholder.typicode.com/posts/"+postid,
+           success:function(data){
+            let template = Handlebars.compile($("#temp1").html());
+                $("#info").html(template(data));   
+                //댓글 목록
+                $.ajax({
+                    type:"get",
+                    dataType:"json",
+                    url:"https://jsonplaceholder.typicode.com/comments?postId="+postid,
+                    success:function(data){
+                            let template = Handlebars.compile($("#temp2").html());
+                            $("#comments").html(template(data)); 
+                    }
+                });
+           } 
+        });
+    });
+   
+          
+         
+                    
+
+    
+    //목록출력함수
+    function getPosts(){
+        $.ajax({
+            type:"get",
+            dataType:"json",
+            url:"https://jsonplaceholder.typicode.com/posts",
+            success:function (data){
+                let newData=[];
+                $(data).each(function(){
+                    let id=this.id;
+                    if(id<=5)newData.push(this);
+                });
+
+                let template = Handlebars.compile($("#temp").html());
+                $("#posts").html(template(newData));
+            }
+        });
+    };
+</script>
+</html>

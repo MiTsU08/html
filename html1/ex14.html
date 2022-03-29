@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>연습14</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <h1>주소등록</h1>
+    <form name="frm">
+        
+        <input type="text" name="name" placeholder="이름입력">
+        <hr>
+        <input type="text" name="address" placeholder="주소입력" size=50>
+        <hr>
+        <input type="submit" value="등록">
+        <input type="reset" value="삭제">
+        <hr>
+
+    </form>
+</body>
+<script>
+    $(frm).on("submit", function(e){
+        e.preventDefault();
+        let name=$(frm.name).val();
+        let address=$(frm.address).val();
+
+        if(name==""){
+            alert("이름 미입력");
+            $(frm.name).focus();
+        }else if(address==""){
+            alert("주소 미입력");
+            $(frm.address).focus();
+        }else{
+            if(!confirm("새주소 등록 합니다")) return;
+            alert(name+":"+address+"등록완료");
+
+        }
+    });
+
+
+</script>
+</html>

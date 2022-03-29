@@ -1,0 +1,102 @@
+<html lang="en">
+<head>
+    <title>앨범목록</title>
+    <link rel="stylesheet" href="common.css">
+    <script src="http://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/3.0.1/handlebars.js"></script>
+    <style>
+    #albums{
+        padding: 30px;
+    }
+    #albums h4{ border-bottom: 1px dotted gray;
+            margin-bottom:  20px;
+            font-size: 20px;
+            color: greenyellow;
+            cursor: pointer;
+    }   
+
+    #photos{
+        overflow: hidden;
+        margin: 30px;
+    }
+    #photos .box{
+        float: left;
+        width: 200px;
+    }
+    </style>
+</head>
+<body>
+    <div id="page">
+        <div id="top">
+            <h1>앨범목록</h1>
+        </div>
+        <div id="center">
+            <div id="albums"></div>
+            <script id="temp" type="text/x-handlebars-template">
+                {{#each .}}
+                    <h4>
+                        <span class="id">{{id}}</span>
+                        <span class="title">{{title}}</span>
+                    </h4>
+                {{/each}}         
+            </script>  
+            <!--사진목록-->     
+            <div id="photos"></div>
+            <script id="temp1" type="text/x-handlebars-template">
+                {{#each .}}
+                  <div class="box">
+                      <img src="{{thumbnailUrl}}">
+                      <h4>{{id}} {{title}}</h4>
+                  </div>
+                {{/each}}         
+            </script>  
+
+        </div>
+    </div>    
+</body>
+<script>
+    getAlbums();
+    function getAlbums(){
+        //앨범 클릭 후 작업        
+        $("#albums").on("click","h4",function(){
+            let albumid=$(this).find(".id").html();
+          $.ajax({
+              type:"get",
+              dataType:"json",
+              url:"https://jsonplaceholder.typicode.com/photos",
+              success:function(data){
+                  let newData=[];
+                  $(data).each(function(){
+                      let id=this.albumId;
+                      let photoid=this.id;
+                      let start=(id-1)*50+4;
+                      let end=start+3;
+
+                      if(id==albumid && photoid>= start && photoid<=end) newData.push(this);
+                      });
+                    let template = Handlebars.compile($("#temp1").html());
+                    $("#photos").html(template(newData));
+              }
+          });
+        })    
+        $.ajax({
+            type:"get",
+            dataType:"json",
+            url:"https://jsonplaceholder.typicode.com/albums",
+            success:function(data){
+                let newData=[];
+                $(data).each(function(){
+                    let id= this.id;
+                    if(id<=5) newData.push(this);
+                });
+
+                let template = Handlebars.compile($("#temp").html());
+                $("#albums").html(template(newData));
+                
+            }
+
+        });
+    }    
+    
+</script>
+</html>

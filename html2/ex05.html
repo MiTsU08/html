@@ -1,0 +1,88 @@
+<html>
+    <head>
+        <title>할일목록</title>
+            <link rel="stylesheet" href="common.css">
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <style>
+        </style>
+    </head>
+    <body>
+        <div id="page">
+            <div id="top">
+                <h1>할일 목록</h1>
+                <table id="todos"></table>
+            </div>
+            <div id="bottons">
+                <button id="prev">이전</button>
+                <span id=curpage>1</span>
+                <button id="next">다음</button>
+            </div>
+            <div id="center">
+
+            </div>
+            <div id="bottom">
+                <h5>ⓒ2022. 인천일보 아카데미 All right reserved.</h5>
+            </div>
+        </div>
+    </body>
+    <!----------------------------------------------------------------------------------------------------------------------------------------->
+    <script>  
+        let curpage=1;
+        let perpagenum=10;
+        let lastpage=Math.ceil(100/perpagenum);      
+        getList();
+            $("#next").on("click",function(){
+                curpage++
+                $("#curpage").html(curpage+"/"+lastpage);
+                getList();
+            });
+            $("#prev").on("click",function(){
+                curpage--;
+                $("#curpage").html(curpage+"/"+lastpage)
+                getList();
+            });
+             
+            
+
+        //목록을 불러오는 함수
+        function getList(){
+            $.ajax({
+                type: "get",
+                dataType: "json",
+                url: "https://jsonplaceholder.typicode.com/todos",
+                success: function(data){
+                    let str="<tr><th width=35>완료</th><th width=600>할일</th></tr>";
+                   $(data).each(function(){
+                       let title=this.title;
+                       let id=this.id;
+                       let completed=this.completed;
+                       let start = (curpage-1)*perpagenum+1;
+                       let end=(curpage)*perpagenum;
+                       if(id>=start && id<=end) {
+                            str+="<tr>"
+                            if(completed){
+                                str+="<td><input type='checkbox' checked></td>";
+                            }else{
+                            str+="<td><input type='checkbox'></td>";
+                            }
+                            str+="<td>"+id+"."+title+"</td>";
+                            str+="</tr>"
+                            
+                       }
+                   });
+                   $("#todos").html(str);
+                }
+            });
+            if(curpage==1){
+                $("#prev").attr("disabled",true);
+            }else{
+                $("#prev").attr("disabled",false);
+            }
+            if(curpage==lastpage){
+                $("#next").attr("disabled",true);
+            }else{
+                $("#next").attr("disabled",false);
+            }
+        }
+    </script>
+</html>

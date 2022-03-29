@@ -1,0 +1,117 @@
+<html>
+    <head>
+        <title>사진목록</title>
+        <link rel="stylesheet" href="common.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <style>
+            #photos{
+                overflow: hidden;
+                width:900px;
+                margin: 0px auto;
+            }
+            .box{
+                float: left;
+                width: 200px;
+                margin: 5px;
+                padding: 5px;
+                text-align: center;
+                border: 1px dotted yellow;
+                border-radius: 5px; 
+                box-shadow: 5px 5px 5px yellowgreen;
+            }
+            .title{ /*말줄임*/
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            button:disabled{background: gray;}
+        </style>
+    </head>
+    <body>
+        <div id="page">
+            <div id="top">
+                <h1>사진목록</h1>
+            </div>
+
+            <div id="center">
+                <div id="photos"></div>
+                    <div id="bottons">
+                        <button id="prev">◀이전</button>
+                        <span id="curpage">1</span>
+                        <button id="next">다음▶</button>
+                        <input type="text" id="inpage" placeholder="페이지 검색">
+                   </div>
+            </div>
+            <div id="bottom">
+                <h5>ⓒ2022. 인천일보아카데미 All right reserved</h5>
+            </div>
+        </div>
+    </body>
+    <script>
+        let curpage=1;
+        let perpagenum=12;
+        let lastpage=Math.ceil(5000/perpagenum);
+        getList();
+        //입력상자에 페이지 검색
+        $("#inpage").on("keydown",function(e){
+            if(e.keyCode==13){
+                curpage=$("#inpage").val();
+                if(lastpage< $("#inpage").val()){
+                    alert("페이지 없음")
+                }else {
+                    curpage=$("#inpage").val();
+                    getList();
+                }
+            }
+        });
+
+        //다음버튼
+        $("#next").on("click",function(){
+            curpage++;
+            getList();
+        });
+        //이전버튼
+          $("#prev").on("click",function(){
+            curpage--;
+            getList();
+        });
+        function getList(){
+            $.ajax({
+                type: "get",
+                dataType:"json",
+                url:"https://jsonplaceholder.typicode.com/photos",
+                success: function(data){
+                    let str="";
+                    $(data).each(function(){
+                        let id= this.id;
+                        let title=this.title;
+                        let img=this.thumbnailUrl;
+                        let start=(curpage-1)*perpagenum+1;
+                        let end=(curpage*perpagenum);
+                        if(id >= start && id<= end){
+                            str += "<div class='box'>"
+                            str +="<image src='"+img+"'>";
+                            str +="<div class='title'>"+id+":"+title+"</div>"
+                            str +="</div>";
+                        }
+                    });
+                    $("#photos").html(str);
+                    $("#curpage").html(curpage+"/"+lastpage);
+                    if(curpage==1){
+                        $("#prev").attr("disabled",true);
+                    }else{
+                        $("#prev").attr("disabled",false);
+                    }
+                    if(curpage==lastpage){
+                        $("#next").attr("disabled",true);
+                    }else{
+                        $("#next").attr("disabled",false);
+                
+                    }
+                }
+
+            });
+        };
+
+    </script>
+</html>

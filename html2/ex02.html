@@ -1,0 +1,161 @@
+<html>
+    <head>
+        <title>회원관리</title>
+        <link rel="stylesheet" href="common.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    </head>
+    <body>
+        <div id="page">
+            <div id="top">
+                <h1>회원관리</h1>
+            </div>
+            <div id="menu" style="border:1px solid gray;padding: 10px;">
+                <span><a href="ex01.html">상품관리</a></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                <span><a href="ex02.html">회원관리</a></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                <span><a href="ex03.html">주소관리</a></span>
+            </div>
+            <div id="center">
+                <form name="frm">
+                    <table>
+                        <tr>
+                            <th width=100>아이디</th>
+                            <td width=500><input type="text"name="id" ></td>
+                        </tr>
+                        <tr>
+                            <th width=100>비밀번호 </th>
+                            <td width=500><input type="password"name="pass"></td>
+                        </tr>
+                        <tr>
+                            <th width=100>비밀번호<br> 재입력</th>
+                            <td width=500><input type="password"name="pass1"></td>
+                        </tr>
+                        <tr>
+                            <th width=100>성명</th>
+                            <td width=500><input type="text"name="name"></td>
+                        </tr>
+                        <tr>
+                            <th width=100>성별</th>
+                            <td width=500>
+                                <input type="radio"name="gender" value="남자">남
+                                <input type="radio"name="gender" value="여자" checked>여
+                            </td>
+                        </tr>
+                        <tr>
+                            <th width=100>취미</th>
+                            <td width=500>
+                                <input type="checkbox"name="hobby1" value="여행">여행
+                                <input type="checkbox"name="hobby2" value="독서" checked>독서
+                                <input type="checkbox"name="hobby3" value="게임" checked>게임
+                                <input type="checkbox"name="hobby4" value="도박">도박
+                            </td>
+                        </tr>
+                        <tr>
+                            <th width=100>직업</th>
+                            <td width=500>
+                                <select name="job" style="height: 25px;">
+                                <option>스포츠선수</option>
+                                <option>변호사</option>
+                                <option>프로그래머 </option>
+                                <option selected>의사</option>
+                                </select>
+                                </td>
+                        </tr>
+
+                        
+                    </table>
+                    <div id="bottons">
+                        <input type="submit" value="등록" class="bubu"> 
+                        <input type="reset" value="삭제" class="bubu">
+                    </div>
+                </form>
+                <hr>
+                <table id="list" style="margin: 0px auto;margin-top: 20px;"> </table>
+                 
+            </div>
+            <div id="bottom">
+                <h5>ⓒ2022. 인천일보아카데미 All right Reserve</h5>
+            </div>
+        </div>
+    </body>
+    <script>
+        $(frm).on("submit",function(e){
+            e.preventDefault();
+            let id=$(frm.id).val();
+            let pass=$(frm.pass).val();
+            let pass1=$(frm.pass1).val();
+            let name=$(frm.name).val();
+            let gender=$("input[name=gender]:checked").val();
+            let job=$(frm.job).val();
+            let hobby1=$("input[name=hobby1]:checked").val();
+            let hobby2=$("input[name=hobby2]:checked").val();
+            let hobby3=$("input[name=hobby3]:checked").val();
+            let hobby4=$("input[name=hobby4]:checked").val();
+
+            if(id==""){
+                alert("ID 미입력");
+                $(frm.id).focus();
+            }else if(id.lenght<5){
+                alert("ID 5글자이상 입력")
+                $(frm.id).focus();
+            }else if(pass==""){
+                alert("비밀번호 미입력")
+                $(frm.pass).focus();
+            }else if(pass1==""){
+                alert("비밀번호 재입력 미입력")
+                $(frm.pass1).focus();
+            }else if(!pass==pass1){
+                alert("비밀번호 미일치")
+                $(frm.pass1).focus();
+            }else if(name==""){
+                alert("이름 미입력")
+                $(frm.name).focus();
+            }else{
+                if(!confirm("회원등록 합니다"))return;
+                    hobby1=hobby1==null?"":hobby1;
+                    hobby2=hobby2==null?"":hobby2;
+                    hobby3=hobby3==null?"":hobby3;
+                    hobby4=hobby4==null?"":hobby4;
+                    
+
+                    let str="<tr class= 'row'>";
+                        str+="<td width=90 class='id'>"+id+"</td>";
+                        str+="<td width=90 class='pass'>"+pass+"</td>";
+                        str+="<td width=50 class='name'>"+name+"</td>";
+                        str+="<td width=50 class='gender'>"+gender+"</td>";
+                        str+="<td width=60 class='hobby1'>"+hobby1+"</td>";
+                        str+="<td width=60 class='hobby2'>"+hobby2+"</td>";
+                        str+="<td width=60 class='hobby3'>"+hobby3+"</td>";
+                        str+="<td width=60 class='hobby4'>"+hobby4+"</td>";
+                        str+="<td width=100class='job'>"+job+"</td>";
+                        str+="<td width=100><button>삭제</button></td>";
+                        str+="</tr>"
+
+                        $("#list").append(str);
+                        $("input[type=reset]").click();
+
+               /*
+                let str="id:"+id+"\n";
+                str+="pass:"+pass+"\n";
+                str+="pass1:"+pass1+"\n";
+                str+="name:"+name+"\n";
+                str+="gender:"+gender+"\n";
+                str+="hobby1:"+hobby1+"\n";
+                str+="hobby2:"+hobby2+"\n";
+                str+="hobby3:"+hobby3+"\n";
+                str+="hobby4:"+hobby4+"\n";
+                alert(str);
+                */
+            
+
+            }
+            $("#list").on("click",".row button",function(){
+                let row=$(this).parent().parent();
+                let id=row.find(".id").html();
+                if(!confirm(id+"를 삭제합니다")) return;
+                row.remove();
+            });
+
+        })
+
+    </script>
+</html>
